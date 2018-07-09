@@ -1,9 +1,11 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Login from '@/views/Login';
+import Home from '@/views/Home';
+import Users from '@/views/users/users';
+// import Year from '@/views/users/year';
 
 Vue.use(Router);
-
 export default new Router({
   routes: [
     {
@@ -14,7 +16,14 @@ export default new Router({
     {
       name: 'home',
       path: '/',
-      component: {name: 'login'}
+      component: Home,
+      children: [
+        {
+          name: 'users',
+          path: '/users',
+          component: Users
+        }
+      ]
     }
   ]
 });

@@ -29,15 +29,20 @@ export default {
     };
   },
   methods: {
-    // 点击按钮登录
-    async handleLogin () {
+    // 点击按钮，登录
+    async handleLogin() {
       const res = await this.$http.post('login', this.formData);
+      // 相当于在回调函数中书写的代码
       const data = res.data;
-      const {meta: { status, msg }} = data;
+      const { meta: { status, msg } } = data;
       if (status === 200) {
+        // 提示
         this.$message.success(msg);
-        const {data: {token}} = data;
+        // 记录token  { data: { token } , meta: {} }
+        const { data: { token } } = data;
         sessionStorage.setItem('token', token);
+        // 跳转
+        this.$router.push({ name: 'home' });
       } else {
         this.$message.error(msg);
       }
