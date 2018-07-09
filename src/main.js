@@ -7,12 +7,20 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import '@/assets/css/style.css';
 import MyAxios from '@/plugins/MaAxios';
+import moment from 'moment';
 
 Vue.config.productionTip = false;
+
+// 全局过滤器，格式化日期
+Vue.filter('fmtDate', (value, fmtString) => {
+  return moment(value).format(fmtString);
+});
+
 // 注册MyAxios插件
 Vue.use(MyAxios);
-// 注册element插件
+// 注册ElementUI插件
 Vue.use(ElementUI);
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
