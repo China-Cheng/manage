@@ -70,7 +70,7 @@
       <el-table-column
         label="操作">
         <template slot-scope="scope">
-          <el-button plain size="mini" type="primary" icon="el-icon-edit" ></el-button>
+          <el-button @click="editUserDialogVisible = true" plain size="mini" type="primary" icon="el-icon-edit" ></el-button>
           <el-button @click="handleDelete(scope.row.id)" plain size="mini" type="danger" icon="el-icon-delete" ></el-button>
           <el-button plain size="mini" type="success" icon="el-icon-check" ></el-button>
         </template>
@@ -119,6 +119,29 @@
             <el-button type="primary" @click="handleAdd">确 定</el-button>
         </div>
     </el-dialog>
+    <!-- 修改 -->
+     <el-dialog title="修改用户" :visible.sync="editUserDialogVisible">
+          <el-form
+          ref="formName"
+          :rules="formRules"
+          label-position="right"
+          label-width="80px"
+          :model="formData">
+              <el-form-item prop="username" label="用户名">
+                  <el-input disabled v-model="formData.username"  auto-complete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="邮箱">
+                  <el-input v-model="formData.email" auto-complete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="电话">
+                  <el-input v-model="formData.mobile" auto-complete="off"></el-input>
+              </el-form-item>
+          </el-form>
+          <div slot="footer" class="dialog-footer">
+              <el-button @click="editUserDialogVisible = false">取 消</el-button>
+              <el-button type="primary" @click="handleEdit">确 定</el-button>
+          </div>
+      </el-dialog>
   </el-card>
 </template>
 
@@ -138,6 +161,8 @@ export default {
       searchValue: '',
       // 控制添加用户的对话框显示隐藏
       addUserDialogVisible: false,
+        // 控制修改对话框是否显示隐藏
+      editUserDialogVisible: false,
       formData: {
         username: '',
         password: '',
@@ -282,9 +307,6 @@ export default {
 </script>
 
 <style>
-.box-card {
-  height: 100%;
-}
 .searchArea {
   margin-top: 10px;
   margin-bottom: 10px;
