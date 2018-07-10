@@ -163,7 +163,7 @@
           </el-form>
           <div slot="footer" class="dialog-footer">
               <el-button @click="setUserDialogVisible = false">取 消</el-button>
-              <el-button type="primary" @click="handleSet">确 定</el-button>
+              <el-button type="primary" @click="handleSetRole">确 定</el-button>
           </div>
     </el-dialog>
   </el-card>
@@ -192,6 +192,7 @@ export default {
       // 分配角色需要的数据
       currentUserName: '',
       currentRoleId: -1,
+      currentID: '',
       roles: [],
       formData: {
         username: '',
@@ -369,6 +370,7 @@ export default {
     },
     // 点击角色分配显示对话框
     async handleSHowSetRoleDialog(user) {
+      this.currentID = user.id;
       // 显示当前角色名字
       this.currentUserName = user.username;
       // 显示对话框
@@ -379,6 +381,21 @@ export default {
       // 根据用户id查询角色id
       const res2 = await this.$http.get(`users/${user.id}`);
       this.currentRoleId = res2.data.data.rid;
+    },
+    // 点击角色分配确定，分配角色
+    async handleSetRole() {
+      const res = await this.$http.put(`users/${this.currentID}/role`, {rid: this.currentRoleId});
+      const data = res.data;
+      const { meta: {status, msg} } = data;
+      if (status === 200) {
+        this.setUserDialogVisible = false;
+        this.$message.success(msg);
+        this.currentUserName = '';
+        this.currentID = -1;
+        this.currentRoleId = -1;
+      } else {
+        this.$message.error(msg);
+      }
     }
   }
 };
