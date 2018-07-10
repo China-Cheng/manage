@@ -77,6 +77,23 @@
         </template>
       </el-table-column>
     </el-table>
+    <!-- 分页 -->
+    <!--@size-change 每页多少条数据发送改变触发的事件
+     @current-change当前页码发生改变
+     current-page当前页码
+     page-sizes每页多少条的下拉框
+     page-size 每页显示多少条
+     total 总条数
+     layout 分页支持的功能配置 -->
+    <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="pagenum"
+      :page-sizes="[100, 200, 300, 400]"
+      :page-size="pagesize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total">
+    </el-pagination>
   </el-card>
 </template>
 
@@ -87,7 +104,11 @@ export default {
       // 用户列表数据
       list: [],
       // true显示正在加载，false的时候不显示
-      loading: true
+      loading: true,
+      // 分页相关数据
+      pagenum: 1, //页码
+      pagesize: 100, //每页条数
+      total: 0 //总条数
     };
   },
   created() {
@@ -120,6 +141,13 @@ export default {
       } else {
         this.$message.error(msg);
       }
+    },
+    // 分页导航条
+    handleSizeChange(val) {
+        console.log(`每页 ${val} 条`);
+    },
+    handleCurrentChange(val) {
+        console.log(`当前页: ${val}`);
     }
   }
 };

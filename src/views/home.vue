@@ -86,7 +86,7 @@
         </el-menu>
       </el-aside>
       <el-main class="main">
-        <!-- 给匹配路由的组件站位 -->
+        <!-- 给匹配路由的组件占位 -->
         <router-view></router-view>
       </el-main>
     </el-container>
