@@ -19,19 +19,19 @@
       </el-table-column>
 
       <el-table-column
-        prop="date"
+        prop="authName"
         label="权限名称"
         width="180">
       </el-table-column>
 
       <el-table-column
-        prop="name"
+        prop="path"
         label="路径"
         width="180">
       </el-table-column>
 
       <el-table-column
-        prop="address"
+        prop="level"
         label="层级">
       </el-table-column>
     </el-table>
@@ -44,6 +44,21 @@ export default {
     return {
       list: []
     };
+  },
+  created() {
+    this.loadData();
+  },
+  methods: {
+    async loadData() {
+       // 发送请求之前，获取token
+      const token = sessionStorage.getItem('token');
+      // 在请求头中设置token
+      this.$http.defaults.headers.common['Authorization'] = token;
+
+      const res = await this.$http.get('rights/list');
+      const data = res.data;
+      this.list = data.data;
+    }
   }
 };
 </script>
