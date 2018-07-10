@@ -70,7 +70,7 @@
       <el-table-column
         label="操作">
         <template slot-scope="scope">
-          <el-button @click="editUserDialogVisible = true" plain size="mini" type="primary" icon="el-icon-edit" ></el-button>
+          <el-button @click="handleShowEditDialog(scope.row)" plain size="mini" type="primary" icon="el-icon-edit" ></el-button>
           <el-button @click="handleDelete(scope.row.id)" plain size="mini" type="danger" icon="el-icon-delete" ></el-button>
           <el-button plain size="mini" type="success" icon="el-icon-check" ></el-button>
         </template>
@@ -161,7 +161,7 @@ export default {
       searchValue: '',
       // 控制添加用户的对话框显示隐藏
       addUserDialogVisible: false,
-        // 控制修改对话框是否显示隐藏
+      // 控制修改对话框是否显示隐藏
       editUserDialogVisible: false,
       formData: {
         username: '',
@@ -301,6 +301,36 @@ export default {
           this.$message.error(msg);
         }
       });
+    },
+    // 点击修改按钮，弹出修改对话框
+    handleShowEditDialog(user) {
+      // 显示对话框
+      this.editUserDialogVisible = true;
+      // 文本框显示内容
+      this.formData = user;
+    },
+    // 点击修改按钮，发送请求修改内容
+    async handleEdit() {
+      // 拿到当前这行id，因为在修改的时候id已经赋值给了formData,所以可以拿到
+      const id = this.formData.id;
+      const mobile = this.formData.mobile;
+      const email = this.formData.email;
+      const res = await this.$http.put(`users/${id}`, {mobile, email});
+      const data = res.data;
+      const { meta: {status, msg} } = data;
+      // 判断
+      if (status === 200) {
+        // 修改成功
+        this.$message.success(msg);
+        // 关闭对话框
+        this.editUserDialogVisible = false;
+        // 重新渲染页面
+        this.loadData();
+        // 清空
+        this.formData = {brand_right: 0};
+      } else {
+        this.message.error(msg);
+      }
     }
   }
 };
