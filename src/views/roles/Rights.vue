@@ -8,6 +8,7 @@
     </el-breadcrumb>
   <!-- 表格 -->
     <el-table
+      hegiht="500"
       class="tb"
       border
       shripe
@@ -33,6 +34,11 @@
       <el-table-column
         prop="level"
         label="层级">
+        <template slot-scope="scope">
+          <span v-if="scope.row.level === '0'">一级</span>
+          <span v-else-if="scope.row.level === '1'">二级</span>
+          <span v-else-if="scope.row.level === '2'">三级</span>
+        </template>
       </el-table-column>
     </el-table>
   </el-card>
@@ -50,11 +56,6 @@ export default {
   },
   methods: {
     async loadData() {
-       // 发送请求之前，获取token
-      const token = sessionStorage.getItem('token');
-      // 在请求头中设置token
-      this.$http.defaults.headers.common['Authorization'] = token;
-
       const res = await this.$http.get('rights/list');
       const data = res.data;
       this.list = data.data;
@@ -66,8 +67,8 @@ export default {
 <style>
 .box-card {
   height: 100%;
+  overflow: auto;
 }
-
 .tb {
   margin-top: 10px;
 }
