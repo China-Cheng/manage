@@ -62,6 +62,7 @@
         <template slot-scope="scope">
           <!-- scope.row 就是当前行绑定的数据对象 -->
           <el-switch
+            @change="handleSwitchChange(scope.row)"
             v-model="scope.row.mg_state"
             active-color="#13ce66"
             inactive-color="#ff4949">
@@ -160,6 +161,18 @@ export default {
     // 搜索按钮
     handleSearch () {
       this.loadData();
+    },
+    // 当开关的状态发生改变
+    async handleSwitchChange(user) {
+      const res = await this.$http.put(`users/${user.id}/state/${user.mg_state}`);
+      // 拿到返回的数据
+      const data = res.data;
+      const { meta: { status, msg } } = data;
+      if (status === 200) {
+        this.$message.success(msg);
+      } else {
+        this.$message.error(msg);
+      }
     }
   }
 };
