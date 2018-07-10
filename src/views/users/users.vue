@@ -95,11 +95,16 @@
     </el-pagination>
     <!-- 添加用户弹出框 -->
     <el-dialog title="添加用户" :visible.sync="addUserDialogVisible">
-        <el-form label-position="right" label-width="120px" :model="formData">
-            <el-form-item label="用户名">
+        <el-form
+        ref="formName"
+        :rules="formRules"
+        label-position="right"
+        label-width="80px"
+        :model="formData">
+            <el-form-item prop="username" label="用户名">
                 <el-input v-model="formData.username"  auto-complete="off"></el-input>
             </el-form-item>
-            <el-form-item label="密码">
+            <el-form-item prop="password" label="密码">
                 <el-input type="password" v-model="formData.password" auto-complete="off"></el-input>
             </el-form-item>
             <el-form-item label="邮箱">
@@ -138,6 +143,17 @@ export default {
         password: '',
         email: '',
         nibile: ''
+      },
+      // 表单验证规则
+      formRules: {
+        username: [
+          { required: true, message: '请输入用户名称', trigger: 'blur' },
+          { min: 1, max: 6, message: '长度在 1 到 6 个字符', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: '请选择密码', trigger: 'change' },
+          { min: 3, max: 6, message: '长度在 3 到 6 个字符', trigger: 'blur' }
+        ]
       }
     };
   },
@@ -233,26 +249,33 @@ export default {
     },
     // 添加数据
     async handleAdd() {
-      const res = await this.$http.post('users', this.formData);
-      // 拿到数据
-      const data = res.data;
-      const { meta: {status, msg} } = data;
-      // 判断
-      if (status === 201) {
-        // 添加成功
-        this.$message.success(msg);
-        // 隐藏对话框
-        this.addUserDialogVisible = false;
-        // 重新渲染页面
-        this.loadData();
-        // 清空输入表单值
-        // for (let key in this.formData) {
-        //   this.formData[key] = '';
-        // }
-        this.formData = {brand_right: 0};
-      } else {
-        this.$message.error(msg);
-      }
+      // 表单的DOM对象
+      this.$refs.formName.validate(async (valid) => {
+        if (!valid) {
+          return this.$message.error('请输入完整内容');
+        }
+        // 验证成功执行添加
+        const res = await this.$http.post('users', this.formData);
+        // 拿到数据
+        const data = res.data;
+        const { meta: {status, msg} } = data;
+        // 判断
+        if (status === 201) {
+          // 添加成功
+          this.$message.success(msg);
+          // 隐藏对话框
+          this.addUserDialogVisible = false;
+          // 重新渲染页面
+          this.loadData();
+          // 清空输入表单值
+          // for (let key in this.formData) {
+          //   this.formData[key] = '';
+          // };
+          this.formData = {brand_right: 0};
+        } else {
+          this.$message.error(msg);
+        }
+      });
     }
   }
 };
