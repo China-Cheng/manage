@@ -73,7 +73,7 @@
         label="操作">
         <template slot-scope="scope">
           <el-button plain size="mini" type="primary" icon="el-icon-edit" ></el-button>
-          <el-button plain size="mini" type="danger" icon="el-icon-delete" ></el-button>
+          <el-button @click="handleDelete(scope.row.id)" plain size="mini" type="danger" icon="el-icon-delete" ></el-button>
           <el-button plain size="mini" type="success" icon="el-icon-check" ></el-button>
         </template>
       </el-table-column>
@@ -173,6 +173,36 @@ export default {
       } else {
         this.$message.error(msg);
       }
+    },
+    // 删除数据
+    async handleDelete(id) {
+      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        // 点击确定按钮执行
+        // 包裹await的函数都要加上async
+        const res = await this.$http.delete(`users/${id}`);
+        // 返回的数据
+        const data = res.data;
+        const { meta: {status, msg} } = data;
+        // 判断status
+        if (status === 200) {
+          this.pagenum = 1;
+          this.loadData();
+          this.$message({
+            type: 'success',
+            message: msg
+          });
+        }
+      }).catch(() => {
+        // 点击取消按钮执行
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
     }
   }
 };
