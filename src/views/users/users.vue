@@ -72,7 +72,7 @@
         <template slot-scope="scope">
           <el-button @click="handleShowEditDialog(scope.row)" plain size="mini" type="primary" icon="el-icon-edit" ></el-button>
           <el-button @click="handleDelete(scope.row.id)" plain size="mini" type="danger" icon="el-icon-delete" ></el-button>
-          <el-button plain size="mini" type="success" icon="el-icon-check" ></el-button>
+          <el-button @click="handleSHowSetRoleDialog(scope.row)" plain size="mini" type="success" icon="el-icon-check" ></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -94,7 +94,7 @@
       :total="total">
     </el-pagination>
     <!-- 添加用户弹出框 -->
-    <el-dialog title="添加用户" :visible.sync="addUserDialogVisible">
+    <el-dialog @closed="hanleClosed" title="添加用户" :visible.sync="addUserDialogVisible">
         <el-form
         ref="formName"
         :rules="formRules"
@@ -120,7 +120,7 @@
         </div>
     </el-dialog>
     <!-- 修改 -->
-     <el-dialog title="修改用户" :visible.sync="editUserDialogVisible">
+     <el-dialog @closed="hanleClosed" title="修改用户" :visible.sync="editUserDialogVisible">
           <el-form
           ref="formName"
           :rules="formRules"
@@ -141,7 +141,31 @@
               <el-button @click="editUserDialogVisible = false">取 消</el-button>
               <el-button type="primary" @click="handleEdit">确 定</el-button>
           </div>
-      </el-dialog>
+    </el-dialog>
+    <!-- 分配角色的弹出框 -->
+     <el-dialog @closed="hanleClosed" title="分配角色" :visible.sync="setUserDialogVisible">
+          <el-form
+          label-position="right"
+          label-width="80px">
+              <el-form-item prop="username" label="用户名">
+                  {{ currentUserName }}
+              </el-form-item>
+              <el-form-item label="角色">
+                  <el-select v-model="currentRoleId">
+                    <el-option disabled label="请选择" :value="-1"></el-option>
+                    <el-option
+                    :key="itme.id"
+                    v-for="itme in roles"
+                    :label="itme.roleName"
+                    :value="itme.id"></el-option>
+                  </el-select>
+              </el-form-item>
+          </el-form>
+          <div slot="footer" class="dialog-footer">
+              <el-button @click="setUserDialogVisible = false">取 消</el-button>
+              <el-button type="primary" @click="handleSet">确 定</el-button>
+          </div>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -163,6 +187,12 @@ export default {
       addUserDialogVisible: false,
       // 控制修改对话框是否显示隐藏
       editUserDialogVisible: false,
+      // 控制角色对话框是否显示隐藏
+      setUserDialogVisible: false,
+      // 分配角色需要的数据
+      currentUserName: '',
+      currentRoleId: -1,
+      roles: [],
       formData: {
         username: '',
         password: '',
@@ -296,7 +326,7 @@ export default {
           // for (let key in this.formData) {
           //   this.formData[key] = '';
           // };
-          this.formData = {brand_right: 0};
+          // this.formData = {brand_right: 0};
         } else {
           this.$message.error(msg);
         }
@@ -307,7 +337,10 @@ export default {
       // 显示对话框
       this.editUserDialogVisible = true;
       // 文本框显示内容
-      this.formData = user;
+      this.formData.username = user.username;
+      this.formData.email = user.email;
+      this.formData.mobile = user.mobile;
+      this.formData.id = user.id;
     },
     // 点击修改按钮，发送请求修改内容
     async handleEdit() {
@@ -326,11 +359,26 @@ export default {
         this.editUserDialogVisible = false;
         // 重新渲染页面
         this.loadData();
-        // 清空
-        this.formData = {brand_right: 0};
       } else {
         this.message.error(msg);
       }
+    },
+    // 添加和修改对话框关闭以后执行
+    hanleClosed() {
+      this.formData = {brand_right: 0};
+    },
+    // 点击角色分配显示对话框
+    async handleSHowSetRoleDialog(user) {
+      // 显示当前角色名字
+      this.currentUserName = user.username;
+      // 显示对话框
+      this.setUserDialogVisible = true;
+      // 获取所有角色
+      const res = await this.$http.get('roles');
+      this.roles = res.data.data;
+      // 根据用户id查询角色id
+      const res2 = await this.$http.get(`users/${user.id}`);
+      this.currentRoleId = res2.data.data.rid;
     }
   }
 };
