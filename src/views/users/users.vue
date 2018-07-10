@@ -10,8 +10,8 @@
     <!-- 搜索区域 -->
     <el-row class="searchArea">
       <el-col :span="24">
-        <el-input class="searchInput" clearable placeholder="请输入内容">
-          <el-button slot="append" icon="el-icon-search"></el-button>
+        <el-input v-model="searchValue" class="searchInput" clearable placeholder="请输入内容">
+          <el-button @click="handleSearch" slot="append" icon="el-icon-search"></el-button>
         </el-input>
         <el-button type="success" plain>添加用户</el-button>
       </el-col>
@@ -108,7 +108,9 @@ export default {
       // 分页相关数据
       pagenum: 1,
       pagesize: 2,
-      total: 0
+      total: 0,
+      // 绑定搜索文本框
+      searchValue: ''
     };
   },
   created() {
@@ -126,7 +128,7 @@ export default {
       // 在请求头中设置token
       this.$http.defaults.headers.common['Authorization'] = token;
 
-      const res = await this.$http.get(`users?pagenum=${this.pagenum}&pagesize=${this.pagesize}`);
+      const res = await this.$http.get(`users?pagenum=${this.pagenum}&pagesize=${this.pagesize}&query=${this.searchValue}`);
 
       // 异步请求结束
       this.loading = false;
@@ -149,13 +151,15 @@ export default {
       // 每页条数改变的时候
       this.pagesize = val;
       this.loadData();
-      console.log(`每页 ${val} 条`);
     },
     handleCurrentChange(val) {
       // 当页码改变的时候
       this.pagenum = val;
       this.loadData();
-      console.log(`当前页: ${val}`);
+    },
+    // 搜索按钮
+    handleSearch () {
+      this.loadData();
     }
   }
 };
