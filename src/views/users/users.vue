@@ -111,7 +111,7 @@
         </el-form>
         <div slot="footer" class="dialog-footer">
             <el-button @click="addUserDialogVisible = false">取 消</el-button>
-            <el-button type="primary" @click="addUserDialogVisible = false">确 定</el-button>
+            <el-button type="primary" @click="handleAdd">确 定</el-button>
         </div>
     </el-dialog>
   </el-card>
@@ -230,6 +230,29 @@ export default {
           message: '已取消删除'
         });
       });
+    },
+    // 添加数据
+    async handleAdd() {
+      const res = await this.$http.post('users', this.formData);
+      // 拿到数据
+      const data = res.data;
+      const { meta: {status, msg} } = data;
+      // 判断
+      if (status === 201) {
+        // 添加成功
+        this.$message.success(msg);
+        // 隐藏对话框
+        this.addUserDialogVisible = false;
+        // 重新渲染页面
+        this.loadData();
+        // 清空输入表单值
+        // for (let key in this.formData) {
+        //   this.formData[key] = '';
+        // }
+        this.formData = {brand_right: 0};
+      } else {
+        this.$message.error(msg);
+      }
     }
   }
 };
