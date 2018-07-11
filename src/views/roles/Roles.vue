@@ -19,7 +19,12 @@
       <!-- 展开列 -->
       <el-table-column type="expand">
         <template slot-scope="scope">
-          你好
+          <el-tag
+          closable
+          type="success"
+          @close="handleClose">
+            你好
+          </el-tag>
         </template>
       </el-table-column>
 
@@ -79,6 +84,10 @@ export default {
         this.$message.error(msg);
       }
       this.loading = false;
+    },
+    // 标签的关闭事件
+    handleClose() {
+      console.log('1');
     }
   }
 };
