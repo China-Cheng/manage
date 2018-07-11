@@ -8,8 +8,11 @@ import 'element-ui/lib/theme-chalk/index.css';
 import '@/assets/css/style.css';
 import MyAxios from '@/plugins/MaAxios';
 import moment from 'moment';
-
+import MyBreadcrumb from '@/components/MyBreadcrumb';
 Vue.config.productionTip = false;
+
+// 注册全局组件
+Vue.component(MyBreadcrumb.name, MyBreadcrumb);
 
 // 全局过滤器，格式化日期
 Vue.filter('fmtDate', (value, fmtString) => {
