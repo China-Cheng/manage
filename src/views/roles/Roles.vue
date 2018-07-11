@@ -10,6 +10,7 @@
 
      <!-- 表格 -->
     <el-table
+      v-loading="loading"
       stripe
       border
       :data="list"
@@ -49,8 +50,28 @@
 export default {
   data() {
     return {
-      list: []
+      list: [],
+      // 数据加载延迟
+      loading: false
     };
+  },
+  created() {
+    this.loadData();
+  },
+  methods: {
+    // 加载角色列表
+    async loadData() {
+      this.loading = true;
+      // resData是服务器返回的数据
+      const { data: resData } = await this.$http.get('roles');
+      const { data, meta: {status, msg} } = resData;
+      if (status === 200) {
+        this.list = data;
+      } else {
+        this.$message.error(msg);
+      }
+      this.loading = false;
+    }
   }
 };
 </script>
