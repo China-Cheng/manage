@@ -15,6 +15,14 @@
       border
       :data="list"
       style="width: 100%">
+
+      <!-- 展开列 -->
+      <el-table-column type="expand">
+        <template slot-scope="scope">
+          你好
+        </template>
+      </el-table-column>
+
       <el-table-column
       type="index"
       width="50">
