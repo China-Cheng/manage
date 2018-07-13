@@ -66,8 +66,8 @@
       <el-table-column
         label="操作">
         <template slot-scope="scope">
-          <el-button plain size="mini" type="primary" icon="el-icon-edit" ></el-button>
-          <el-button plain size="mini" type="danger" icon="el-icon-delete" ></el-button>
+          <el-button @click="handleShowEdit(scope.row)" plain size="mini" type="primary" icon="el-icon-edit" ></el-button>
+          <el-button @click="handleDelete(scope.row)" plain size="mini" type="danger" icon="el-icon-delete" ></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -82,7 +82,7 @@
       :total="total">
     </el-pagination>
     <!-- 添加数据的表单 -->
-    <el-dialog title="添加分类" :visible.sync="addFormDialog">
+    <el-dialog title="编辑分类" :visible.sync="addFormDialog">
       <el-form :model="addForm" ref="addForm">
 
         <el-form-item label="分类名称" label-width="100px" prop="cat_name">
@@ -106,6 +106,19 @@
       <div slot="footer" class="dialog-footer">
         <el-button @click="addFormDialog = false">取 消</el-button>
         <el-button type="primary" @click="handleAdd">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 编辑数据的表单 -->
+     <el-dialog title="编辑分类" :visible.sync="editFormDialog">
+      <el-form :model="editForm" ref="addForm">
+        <el-form-item label="分类名称" label-width="100px" prop="cat_name">
+          <el-input v-model="editForm.cat_name" auto-complete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="editFormDialog = false">取 消</el-button>
+        <el-button type="primary" @click="handleEdit">确 定</el-button>
       </div>
     </el-dialog>
   </el-card>
@@ -132,13 +145,17 @@ export default {
         cat_name: ''
       },
       selectedOptions2: [],
-      options: []
+      options: [],
+      // 编辑分类
+      editFormDialog: false,
+      editForm: []
     };
   },
   created() {
     this.loadData();
   },
   methods: {
+    // 渲染数据
     async loadData() {
       const { data: resData } = await this.$http.get(`categories?type=3&pagenum=${this.pagenum}&pagesize=${this.pagesize}`);
       this.loading = false;
@@ -188,6 +205,48 @@ export default {
         this.addFormDialog = false;
         this.$refs['addForm'].resetFields();
         this.selectedOptions2 = [];
+      } else {
+        this.$message.error(msg);
+      }
+    },
+    // 删除分类
+    handleDelete(row) {
+      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        const {data: {meta: {status, msg}}} = await this.$http.delete(`categories/${row.cat_id}`);
+        if (status === 200) {
+          this.$message.success(msg);
+          this.loadData();
+        } else {
+          this.$message.error(msg);
+        }
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
+    },
+    // 编辑分类
+    handleShowEdit(row) {
+      this.editForm = row;
+      this.editFormDialog = true;
+    },
+    // 编辑分类修改
+    async handleEdit() {
+      const { data: resData } = await this.$http({
+        url: `categories/${this.editForm.cat_id}`,
+        data: { cat_name: this.editForm.cat_name },
+        method: 'put'
+      });
+      const { meta: {status, msg} } = resData;
+      if (status === 200) {
+        this.editFormDialog = false;
+        this.loadData();
+        this.$message.success(msg);
       } else {
         this.$message.error(msg);
       }
