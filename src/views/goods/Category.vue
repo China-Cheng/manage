@@ -6,7 +6,7 @@
    <!-- 添加按钮 -->
    <el-row class="row-add">
       <el-col :span="24">
-        <el-button type="success" plain>添加分类</el-button>
+        <el-button @click="handleShowAdd" type="success" plain>添加分类</el-button>
       </el-col>
     </el-row>
 
@@ -81,6 +81,33 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="total">
     </el-pagination>
+    <!-- 添加数据的表单 -->
+    <el-dialog title="添加分类" :visible.sync="addFormDialog">
+      <el-form :model="addForm" ref="addForm">
+
+        <el-form-item label="分类名称" label-width="100px" prop="cat_name">
+          <el-input v-model="addForm.cat_name" auto-complete="off"></el-input>
+        </el-form-item>
+
+        <el-form-item label="父级分类" label-width="100px">
+          <el-cascader
+            expand-trigger="hover"
+            :options="options"
+            change-on-select
+            :props="{
+              label: 'cat_name',
+              value: 'cat_id',
+              children: 'children'
+            }"
+            v-model="selectedOptions2">
+          </el-cascader>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="addFormDialog = false">取 消</el-button>
+        <el-button type="primary" @click="handleAdd">确 定</el-button>
+      </div>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -98,7 +125,14 @@ export default {
       // 分页数据
       pagenum: 1,
       pagesize: 5,
-      total: 0
+      total: 0,
+      // 添加数据
+      addFormDialog: false,
+      addForm: {
+        cat_name: ''
+      },
+      selectedOptions2: [],
+      options: []
     };
   },
   created() {
@@ -114,7 +148,7 @@ export default {
       // 获取总条数
       this.total = total;
     },
-     // 分页方法
+    // 分页方法
     handleSizeChange(val) {
       this.pagesize = val;
       this.loadData();
@@ -122,11 +156,46 @@ export default {
     handleCurrentChange(val) {
       this.pagenum = val;
       this.loadData();
+    },
+    // 点击弹出添加框
+    async handleShowAdd() {
+      // 显示对话框
+      this.addFormDialog = true;
+      // 获取数据绑定到级联选择器中
+      const res = await this.$http.get('categories', {
+        params: {
+          type: 2
+        }
+      });
+      this.options = res.data.data;
+    },
+    // 处理添加分类
+    async handleAdd() {
+      const addForm = {
+        ...this.addForm,
+        cat_pid: this.selectedOptions2[this.selectedOptions2.length - 1],
+        cat_level: this.selectedOptions2.length
+      };
+      const { data: resData } = await this.$http({
+        url: '/categories',
+        method: 'post',
+        data: addForm
+      });
+      const { meta: { status, msg } } = resData;
+      if (status === 201) {
+        this.$message.success(msg);
+        this.loadData();
+        this.addFormDialog = false;
+        this.$refs['addForm'].resetFields();
+        this.selectedOptions2 = [];
+      } else {
+        this.$message.error(msg);
+      }
     }
   },
   components: {
-      ElTreeGrid
-    }
+    ElTreeGrid
+  }
 };
 </script>
 
