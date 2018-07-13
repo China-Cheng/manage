@@ -61,6 +61,16 @@
         </template>
       </el-table-column>
     </el-table>
+     <!-- 分页 -->
+    <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page.sync="pagenum"
+      :page-sizes="[5, 10, 15, 20]"
+      :page-size="pagesize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total">
+    </el-pagination>
   </el-card>
 </template>
 
@@ -88,6 +98,15 @@ export default {
       this.list = result;
       // 获取总条数
       this.total = total;
+    },
+     // 分页方法
+    handleSizeChange(val) {
+      this.pagesize = val;
+      this.loadData();
+    },
+    handleCurrentChange(val) {
+      this.pagenum = val;
+      this.loadData();
     }
   }
 };
