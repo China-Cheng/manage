@@ -54,7 +54,8 @@
           action="http://localhost:8888/api/private/v1/upload"
           :on-preview="handlePreview"
           :on-remove="handleRemove"
-          :headers="header"
+          :headers="headers"
+          @on-success="handleUploadSuccess"
           :file-list="fileList2"
           list-type="picture">
           <el-button size="small" type="primary">点击上传</el-button>
@@ -100,13 +101,16 @@ export default {
         goods_weight: '',
         goods_number: '',
         goods_cat: '',
-        goods_introduce: ''
+        goods_introduce: '',
+        pics: [
+          { pic: '图片路径' }
+        ]
       },
       activeName: '0',
       stepActive: 0,
       // 图片上传
-      headers:{Authorization: window.sessionStorage.getItem('token')},
-      fileList2: [{name: 'food.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'}, {name: 'food2.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'}]
+      headers: { Authorization: window.sessionStorage.getItem('token') },
+      fileList2: []
     };
   },
   methods: {
@@ -130,23 +134,19 @@ export default {
       }
     },
     handleGaiBianLe(data) {
-      console.log(data);
       this.form.goods_cat = data.join(',');
     },
     onEditorBlur () {
-      console.log('onEditorBlur');
     },
     onEditorFocus () {
-      console.log('onEditorFocus');
     },
     onEditorReady () {
-      console.log('onEditorReady');
     },
     handleNextStep () {
       this.activeName = Number.parseInt(this.activeName) + 1 + '';
       this.stepActive++;
     },
-      // 处理 tabs 标签点击事件
+    // 处理 tabs 标签点击事件
     handleTabClick (tab, event) {
       // console.log('handleTabClick')
       // console.log(tab.index)
@@ -154,10 +154,25 @@ export default {
     },
     // 图片上传
     handleRemove(file, fileList) {
-      console.log(file, fileList);
+      // findindex找元素的索引，找不到返回-1
+      const index = this.form.pics.findeIndex(function (item) {
+        return item.pic === file.response.data.tmp_path;
+      });
+      if (index !== -1) {
+        // 从当前元素索引删除一个
+        this.form.pics.splice(index, 1);
+      }
     },
     handlePreview(file) {
       console.log(file);
+    },
+    handleUploadSuccess(response) {
+      // response: 接口响应结果对象
+      // file 上传的文件对象
+      // fileList 文件列表数据
+      this.form.pics.push({
+        pic: response.data.tmp_path
+      });
     }
   },
   components: {
