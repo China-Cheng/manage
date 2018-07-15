@@ -42,16 +42,16 @@ export default {
     handleChange () {
       // 这里的含义就是对外部发布一个自定义事件，外部就是使用该组件的父组件
       // 然后我们可以在调用该组件的时候，为其指定自定义事件处理函数来接收结果
-      this.$emit('gaibianle', this.selectedOptions)
+      this.$emit('gaibianle', this.selectedOptions);
     }
   },
   data () {
     return {
       options: [],
       selectedOptions: []
-    }
+    };
   }
-}
+};
 </script>
 
 <style>
