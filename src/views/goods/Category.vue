@@ -91,6 +91,8 @@
 
         <el-form-item label="父级分类" label-width="100px">
           <el-cascader
+            clearable
+            placeholder="默认是一级分类"
             expand-trigger="hover"
             :options="options"
             change-on-select
@@ -188,9 +190,13 @@ export default {
     },
     // 处理添加分类
     async handleAdd() {
+      let catPid = 0;
+      if (this.selectedOptions2[0]) {
+        catPid = this.selectedOptions2[this.selectedOptions2.length - 1];
+      };
       const addForm = {
         ...this.addForm,
-        cat_pid: this.selectedOptions2[this.selectedOptions2.length - 1],
+        cat_pid: catPid,
         cat_level: this.selectedOptions2.length
       };
       const { data: resData } = await this.$http({
